@@ -13,10 +13,10 @@ This container runs restic backups in regular intervals.
 
 If you need to execute a script before or after each backup, 
 you need to add your hook script in the container folder `/hooks`:
-```
+```sh
 -v ~/hooks:/hooks
 ```
-Call your pre-backup script `pre-backup.sh` and post backup script `post-backup.sh`
+Call your pre-backup script `pre-backup.sh` and post backup script `post-backup.sh`.
 
 ## Usage
 Test:

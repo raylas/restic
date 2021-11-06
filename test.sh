@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 wait_period=0
-timeout_seconds=15
+timeout_seconds=300
 container_name=restic-test
 
 stop_container() {
