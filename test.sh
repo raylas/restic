@@ -4,20 +4,21 @@ wait_period=0
 timeout_seconds=300
 container_name=restic-test
 
+
 stop_container() {
   docker stop $(docker ps | grep $container_name | awk '{print $1}')
 }
 
 clean_directories() {
-  rm -rf /tmp/test-data/ /tmp/test-repo/
+  rm -rf $(pwd)/test-data/ $(pwd)/test-repo/
 }
 
 echo ":: Removing old container names '$container_name' if exists"
 docker rm -f -v $container_name || true
 
 echo ":: Creating test directories & file"
-mkdir -p /tmp/{test-data,test-repo}
-echo "Hello, World!" > /tmp/test-data/test-file.txt
+mkdir -p $(pwd)/{test-data,test-repo}
+echo "Hello, World!" > $(pwd)/test-data/test-file.txt
 
 echo ":: Build $container_name container"
 docker build -t $container_name .
@@ -29,12 +30,12 @@ docker run --detach --rm --name $container_name \
 -e "RESTIC_TAG=test" \
 -e "BACKUP_CRON=* * * * *" \
 -e "RESTIC_FORGET_ARGS=--keep-last 10" \
--v /tmp/test-data:/data \
--v /tmp/test-repo:/mnt/restic \
+-v $(pwd)/test-data:/data \
+-v $(pwd)/test-repo:/mnt/restic \
 -t $container_name
 
 while true; do
-  if [ -z "$(ls -A /tmp/test-repo/snapshots)" ]; then
+  if [ -z "$(ls -A $(pwd)/test-repo/snapshots)" ]; then
     echo ":: Waiting for test repository contents"
   else
     echo ":: Snapshots found, stopping container"
