@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+    - main
+    tags:
+    - '*'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout local repo
+      uses: actions/checkout@v2
+
+    - name: Test image
+      run: make test
+
+  release:
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout local repo
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      run: |
+        docker login \
+          -u ${{ secrets.DOCKER_USERNAME }} \
+          -p ${{ secrets.DOCKER_TOKEN }}
+    
+    - name: Build and push image
+      run: |
+        docker buildx build \
+          --tag raylas/restic:latest \
+          --tag raylas/restic:${GITHUB_REF#refs/*/} \
+          --push \
+          .
