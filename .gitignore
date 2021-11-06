@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# Testing directories
+test-data
+test-repo
