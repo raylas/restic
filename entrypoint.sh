@@ -1,5 +1,36 @@
 #!/usr/bin/env bash
 
+echo ":: Setting up environment"
+# Check if restic password exists
+if [[ -z $RESTIC_PASSWORD && ! -f "/run/secrets/restic_password" ]]; then
+  echo "The restic password cannot be found."
+  echo "The following must be set:"
+  echo "- RESTIC_PASSWORD (will also check /run/secrets/restic_password)"
+  exit 1
+elif [[ -z $RESTIC_PASSWORD ]]; then
+  export RESTIC_PASSWORD=$(cat /run/secrets/uisp_api_token)
+fi
+
+# Check if B2 account ID exists
+if [[ -z $B2_ACCOUNT_ID && ! -f "/run/secrets/b2_account_id" ]]; then
+  echo "The B2 account ID cannot be found."
+  echo "The following must be set:"
+  echo "- B2_ACCOUNT_ID (will also check /run/secrets/b2_account_id)"
+  exit 1
+elif [[ -z $B2_ACCOUNT_ID ]]; then
+  export B2_ACCOUNT_ID=$(cat /run/secrets/b2_account_id)
+fi
+
+# Check if B2 account key exists
+if [[ -z $B2_ACCOUNT_KEY && ! -f "/run/secrets/b2_account_key" ]]; then
+  echo "The B2 account KEY cannot be found."
+  echo "The following must be set:"
+  echo "- B2_ACCOUNT_KEY (will also check /run/secrets/b2_account_key)"
+  exit 1
+elif [[ -z $B2_ACCOUNT_KEY ]]; then
+  export B2_ACCOUNT_KEY=$(cat /run/secrets/b2_account_key)
+fi
+
 echo ":: Starting container"
 
 if [ -n "${NFS_TARGET}" ]; then
