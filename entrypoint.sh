@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo ":: Starting container"
+
 echo ":: Setting up environment"
 # Check if restic password exists
 if [[ -z $RESTIC_PASSWORD && ! -f "/run/secrets/restic_password" ]]; then
@@ -8,7 +10,7 @@ if [[ -z $RESTIC_PASSWORD && ! -f "/run/secrets/restic_password" ]]; then
   echo "- RESTIC_PASSWORD (will also check /run/secrets/restic_password)"
   exit 1
 elif [[ -z $RESTIC_PASSWORD ]]; then
-  export RESTIC_PASSWORD=$(cat /run/secrets/uisp_api_token)
+  export RESTIC_PASSWORD=$(cat /run/secrets/restic_password)
 fi
 
 # Check if B2 account ID exists
@@ -16,7 +18,6 @@ if [[ -z $B2_ACCOUNT_ID && ! -f "/run/secrets/b2_account_id" ]]; then
   echo "The B2 account ID cannot be found."
   echo "The following must be set:"
   echo "- B2_ACCOUNT_ID (will also check /run/secrets/b2_account_id)"
-  exit 1
 elif [[ -z $B2_ACCOUNT_ID ]]; then
   export B2_ACCOUNT_ID=$(cat /run/secrets/b2_account_id)
 fi
@@ -26,13 +27,11 @@ if [[ -z $B2_ACCOUNT_KEY && ! -f "/run/secrets/b2_account_key" ]]; then
   echo "The B2 account KEY cannot be found."
   echo "The following must be set:"
   echo "- B2_ACCOUNT_KEY (will also check /run/secrets/b2_account_key)"
-  exit 1
 elif [[ -z $B2_ACCOUNT_KEY ]]; then
   export B2_ACCOUNT_KEY=$(cat /run/secrets/b2_account_key)
 fi
 
-echo ":: Starting container"
-
+# Check for NFS configuration
 if [ -n "${NFS_TARGET}" ]; then
     echo ":: Mounting NFS based on NFS_TARGET: ${NFS_TARGET}"
     mount -o nolock -v ${NFS_TARGET} /mnt/restic
