@@ -10,15 +10,15 @@ stop_container() {
 }
 
 clean_directories() {
-    rm -rf $(pwd)/test-data/ $(pwd)/test-repo/
+    rm -rf test-data/ test-repo/
 }
 
 echo ":: Removing old container names '$container_name' if exists"
 docker rm -f -v $container_name || true
 
 echo ":: Creating test directories & file"
-mkdir -p $(pwd)/{test-data,test-repo}
-echo "Hello, World!" > $(pwd)/test-data/test-file.txt
+mkdir -p {test-data,test-repo}
+echo "Hello, World!" > test-data/test-file.txt
 
 echo ":: Build $container_name container"
 docker build -t $container_name .
