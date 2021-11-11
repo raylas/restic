@@ -10,12 +10,14 @@ RUN mkdir -p /mnt/restic /var/spool/cron/crontabs /var/log && \
     touch /var/log/cron.log;
 
 ENV RESTIC_REPOSITORY=/mnt/restic
-ENV RESTIC_PASSWORD=""
 ENV RESTIC_TAG=""
-ENV NFS_TARGET=""
-ENV BACKUP_CRON="0 */6 * * *"
 ENV RESTIC_FORGET_ARGS=""
 ENV RESTIC_JOB_ARGS=""
+ENV RESTIC_PASSWORD=""
+ENV RESTIC_PASSWORD_FILE=""
+ENV B2_ACCOUNT_ID=""
+ENV B2_ACCOUNT_KEY=""
+ENV BACKUP_CRON="5 10 * * *"
 ENV MAILX_ARGS=""
 
 # Backup directory

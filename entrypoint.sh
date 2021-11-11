@@ -1,35 +1,29 @@
 #!/usr/bin/env bash
 
+# Parse _FILE suffixed variables
+file_env() {
+    local var="$1"
+    local fileVar="${var}_FILE"
+    local def="${2:-}"
+    if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
+        echo ":: Both $var and $fileVar are set (but are exclusive)"
+    fi
+    local val="$def"
+    if [ "${!var:-}" ]; then
+        val="${!var}"
+    elif [ "${!fileVar:-}" ]; then
+        val="$(< "${!fileVar}")"
+    fi
+    export "$var"="$val"
+    unset "$fileVar"
+}
+
 echo ":: Starting container"
 
 echo ":: Setting up environment"
-# Check if restic password exists
-if [[ -z $RESTIC_PASSWORD && ! -f "/run/secrets/restic_password" ]]; then
-  echo "The restic password cannot be found."
-  echo "The following must be set:"
-  echo "- RESTIC_PASSWORD (will also check /run/secrets/restic_password)"
-  exit 1
-elif [[ -z $RESTIC_PASSWORD ]]; then
-  export RESTIC_PASSWORD=$(cat /run/secrets/restic_password)
-fi
-
-# Check if B2 account ID exists
-if [[ -z $B2_ACCOUNT_ID && ! -f "/run/secrets/b2_account_id" ]]; then
-  echo "The B2 account ID cannot be found."
-  echo "The following must be set:"
-  echo "- B2_ACCOUNT_ID (will also check /run/secrets/b2_account_id)"
-elif [[ -z $B2_ACCOUNT_ID ]]; then
-  export B2_ACCOUNT_ID=$(cat /run/secrets/b2_account_id)
-fi
-
-# Check if B2 account key exists
-if [[ -z $B2_ACCOUNT_KEY && ! -f "/run/secrets/b2_account_key" ]]; then
-  echo "The B2 account KEY cannot be found."
-  echo "The following must be set:"
-  echo "- B2_ACCOUNT_KEY (will also check /run/secrets/b2_account_key)"
-elif [[ -z $B2_ACCOUNT_KEY ]]; then
-  export B2_ACCOUNT_KEY=$(cat /run/secrets/b2_account_key)
-fi
+file_env "RESTIC_PASSWORD"
+file_env "B2_ACCOUNT_ID"
+file_env "B2_ACCOUNT_KEY"
 
 # Check for NFS configuration
 if [ -n "${NFS_TARGET}" ]; then
@@ -37,7 +31,9 @@ if [ -n "${NFS_TARGET}" ]; then
     mount -o nolock -v ${NFS_TARGET} /mnt/restic
 fi
 
+# List snapshots
 restic snapshots &>/dev/null
+
 status=$?
 echo ":: Repository status: $status"
 
