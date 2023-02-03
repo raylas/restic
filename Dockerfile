@@ -1,4 +1,4 @@
-FROM restic/restic:0.12.1
+FROM restic/restic:0.15.1
 
 RUN apk add --update --no-cache \
     bash                        \
